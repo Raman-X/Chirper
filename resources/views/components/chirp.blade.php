@@ -8,7 +8,6 @@
                     <div class="size-10 rounded-full">
                         <img src="https://avatars.laravel.cloud/{{ urlencode($chirp->user->email) }}"
                             alt="{{ $chirp->user->name }}'s avatar" class="rounded-full" />
-
                     </div>
                 </div>
             @else
@@ -20,16 +19,39 @@
                 </div>
             @endif
 
-            <div class="min-w-0">
-                <div class="flex items-center gap-1">
-                    <span class="text-sm font-semibold">{{ $chirp->user ? $chirp->user->name : 'Anonymous' }}</span>
-                    <span class="text-base-content/60">·</span>
-                    <span class="text-sm text-base-content/60">{{ $chirp->created_at->diffForHumans() }}</span>
-                </div>
+            <div class="min-w-0 flex-1">
+                <div class="flex justify-between w-full">
+                    <div class="flex items-center gap-1">
 
-                <p class="mt-1">
-                    {{ $chirp->message }}
-                </p>
+                        <span class="text-sm font-semibold">{{ $chirp->user ? $chirp->user->name : 'Anonymous' }}</span>
+                        <span class="text-base-content/60">·</span>
+                        <span class="text-sm text-base-content/60">{{ $chirp->created_at->diffForHumans() }}</span>
+                    </div>
+
+                    @auth
+
+                        <div class="flex gap-1">
+                            @can('update', $chirp)
+                                <a href="/chirps/{{ $chirp->id }}/edit" class="btn btn-ghost btn-xs">
+                                    Edit
+                                </a>
+                            @endcan
+                            @can('delete', $chirp)
+                                <form method="POST" action="/chirps/{{ $chirp->id }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        onclick="return confirm('Are you sure you want to delete this chirp?')"
+                                        class="btn btn-ghost btn-xs text-error">
+                                        Delete
+                                    </button>
+                                </form>
+                            @endcan
+                        </div>
+                    @endauth
+
+                </div>
+                <p class="mt-1">{{ $chirp->message }}</p>
             </div>
         </div>
     </div>
